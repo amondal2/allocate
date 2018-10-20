@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Dropzone from 'react-dropzone';
 import './App.css';
-import axios, { post } from 'axios';
+import { post } from 'axios';
 
 const styles = {
   dropzone: {
@@ -11,6 +11,12 @@ const styles = {
 }
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: [],
+    }
+  }
   fileUpload = (file) => {
     const url = 'http://localhost:5000/';
     const formData = new FormData();
@@ -25,18 +31,27 @@ class App extends Component {
 
   onDrop = ([file]) => {
     this.fileUpload(file).then(response => {
-      console.log(response);
+      const items = response.data.split('\n');
+      this.setState({
+        items,
+      });
     });
   }
 
   render() {
-    return (
-      <div style={styles.dropzone}>
-        <Dropzone
-          onDrop={this.onDrop}
-        > Drag receipt here </Dropzone>
-      </div>
+    if (this.state.items.length === 0) {
+      return (
+        <div style={styles.dropzone}>
+          <Dropzone
+            onDrop={this.onDrop}
+          > Drag receipt here </Dropzone>
+        </div>
+      );
+    }
+    const itemsList = this.state.items.map(
+      item => (<h1 key={item}> {item} </h1>)
     );
+    return itemsList;
   }
 }
 
